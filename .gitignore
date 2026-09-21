@@ -1,0 +1,49 @@
+# Python
+__pycache__/
+*.py[cod]
+*.so
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Ruff
+.ruff_cache/
+
+# IDEs
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Project data
+data/raw/*
+data/processed/*
+data/samples/*
+
+# Generated outputs
+outputs/
+artifacts/
+
+# Model files
+models/
+checkpoints/
+
+# Logs
+*.log
+logs/
+
+# Jupyter
+.ipynb_checkpoints/
