@@ -1,9 +1,12 @@
 from pathlib import Path
 
 import numpy as np
-from PIL import Image, UnidentifiedImageError
+from PIL import Image as PILImage
+from PIL import UnidentifiedImageError
 
 from controlled_editor.exceptions import ImageLoadError
+from controlled_editor.image.image import Image
+
 
 SUPPORTED_EXTENSIONS = frozenset({".jpg", ".jpeg", ".png", ".webp"})
 
@@ -28,12 +31,14 @@ def load_image(path: str | Path) -> np.ndarray:
         raise ImageLoadError(f"Unsupported image format: {image_path.suffix}")
 
     try:
-        with Image.open(image_path) as image:
+        with PILImage.open(image_path) as image:
             rgb_image = image.convert("RGB")
             return np.array(rgb_image, dtype=np.uint8).copy()
 
     except (UnidentifiedImageError, OSError) as exc:
         raise ImageLoadError(f"Unable to load image: {image_path}") from exc
+
+    return Image(data)
 
 
 def save_image(image: np.ndarray, path: str | Path) -> None:
@@ -44,7 +49,7 @@ def save_image(image: np.ndarray, path: str | Path) -> None:
         raise ImageLoadError(f"Unsupported image format: {image_path.suffix}")
 
     try:
-        Image.fromarray(image, mode="RGB").save(image_path)
+        PILImage.fromarray(image, mode="RGB").save(image_path)
 
     except (OSError, ValueError) as exc:
         raise ImageLoadError(f"Unable to save image: {image_path}") from exc
