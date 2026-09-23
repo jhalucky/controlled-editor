@@ -4,6 +4,7 @@ import numpy as np
 
 from controlled_editor.exceptions import ImageValidationError
 
+
 @dataclass(frozen=True, slots=True)
 class Mask:
     data: np.ndarray
@@ -20,9 +21,7 @@ class Mask:
 
         if self.data.dtype == np.uint8:
             if not np.all((self.data == 0) | (self.data == 1)):
-                raise ImageValidationError(
-                    "Binary mask values must be 0 or 1."
-                )
+                raise ImageValidationError("Binary mask values must be 0 or 1.")
 
         elif self.data.dtype == np.float32:
             if not np.all(np.isfinite(self.data)):
@@ -36,11 +35,10 @@ class Mask:
                 "mask dtype must be uint8 for binary masks or float32 for soft masks"
             )
 
-
     @property
     def height(self) -> int:
         return self.data.shape[0]
-    
+
     @property
     def width(self) -> int:
         return self.data.shape[1]
@@ -56,3 +54,36 @@ class Mask:
     @property
     def is_soft(self) -> bool:
         return self.data.dtype == np.float32
+
+    @classmethod
+    def empty(cls, height: int, width: int) -> "Mask":
+        if height <= 0 or width <= 0:
+            raise ImageValidationError("Mask dimesnions must be positive.")
+
+        return cls(np.zeros((height, width), dtype=np.uint8))
+
+    @classmethod
+    def full(cls, height: int, width: int) -> "Mask":
+        if height <= 0 or width <= 0:
+            raise ImageValidationError("Mask dimensions must be positive.")
+
+        return cls(np.ones((height, width), dtype=np.uint8))
+
+    def invert(self) -> "Mask":
+        if not self.is_binary:
+            raise ImageValidationError("Invert is only supported for binary masks.")
+
+        return Mask(1 - self.data)
+
+    def bounding_box(self) -> tuple[int, int, int, int] | None:
+        if not np.any(self.data):
+            return None
+
+        ys, xs = np.where(self.data > 0)
+
+        x1 = int(xs.min())
+        y1 = int(ys.min())
+        x2 = int(xs.max()) + 1
+        y2 = int(ys.max()) + 1
+
+        return x1, y1, x2, y2
