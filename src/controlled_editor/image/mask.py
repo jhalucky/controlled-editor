@@ -33,7 +33,7 @@ class Mask:
 
         else:
             raise ImageValidationError(
-                "mask dtype must be uint8 for binary masks or float32 for soft masks."
+                "mask dtype must be uint8 for binary masks or float32 for soft masks"
             )
 
 
